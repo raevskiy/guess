@@ -168,7 +168,7 @@ public class GamePart {
 		buttonSurrender.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				game.stop();
+				game.cancel();
 			}
 		});
 
