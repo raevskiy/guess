@@ -2,6 +2,7 @@ package com.noname.guess.number.core.dao;
  
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,9 +20,9 @@ public class FileDaoImpl<T> implements FileDao<T> {
      * deserialize to Object from given file. We use the general Object so as
      * that it can work for any Java Class.
      */
-    public T deserialize(String fileName) throws IOException,
+    public T deserialize(File file) throws IOException,
             ClassNotFoundException {
-        FileInputStream fis = new FileInputStream(fileName);
+        FileInputStream fis = new FileInputStream(file);
         BufferedInputStream bis = new BufferedInputStream(fis);
         ObjectInputStream ois = new ObjectInputStream(bis);
         @SuppressWarnings("unchecked")
@@ -33,9 +34,9 @@ public class FileDaoImpl<T> implements FileDao<T> {
     /**
      * serialize the given object and save it to given file
      */
-    public void serialize(T obj, String fileName)
+    public void serialize(T obj, File file)
             throws IOException {
-        FileOutputStream fos = new FileOutputStream(fileName);
+        FileOutputStream fos = new FileOutputStream(file);
         BufferedOutputStream bos = new BufferedOutputStream(fos);
         ObjectOutputStream oos = new ObjectOutputStream(bos);
         oos.writeObject(obj);

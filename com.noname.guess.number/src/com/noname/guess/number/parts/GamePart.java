@@ -11,13 +11,23 @@
  *******************************************************************************/
 package com.noname.guess.number.parts;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.inject.Named;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.window.Window;
@@ -34,11 +44,14 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 
+import com.noname.guess.number.addons.GuessNumberAddon;
 import com.noname.guess.number.core.GameEventListener;
 import com.noname.guess.number.core.GuessNumberGame;
 import com.noname.guess.number.core.GuessNumberLevel;
+import com.noname.guess.number.core.dao.RatingDao;
 
 public class GamePart {
 
@@ -49,6 +62,11 @@ public class GamePart {
 	private Label labelOutcome;
 	private Button buttonGuess;
 
+	@Inject
+	RatingDao rationDao;
+	@Inject
+	@Named(GuessNumberAddon.RATING_KEY)
+	private Map<String, Integer> rating;
 	@Inject
 	private GuessNumberGame game;
 	@Inject
@@ -141,7 +159,7 @@ public class GamePart {
 		buttonGuess.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		buttonGuess.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(SelectionEvent event) {
 				int supposedValue = spinnerGuessValue.getSelection();
 				int outcome = game.guess(supposedValue);
 				if (outcome < 0) {
@@ -149,10 +167,35 @@ public class GamePart {
 				} else if (outcome > 0) {
 					labelOutcome.setText("The number is less then " + supposedValue);
 				} else {
-					InputDialog dlg = new InputDialog(Display.getCurrent().getActiveShell(),
-							"Well done. Total attempts: " + game.getAttempts(), "Enter your name", "Player",
+					Shell activeShell = Display.getCurrent().getActiveShell();
+					InputDialog dlg = new InputDialog(activeShell,
+							"Well done. Total attempts: " + game.getAttempts(),
+							"Enter your name",
+							"Player",
 							new LengthValidator());
 					if (dlg.open() == Window.OK) {
+						String playerName = dlg.getValue();
+						Integer oldRating = rating.get(playerName);
+						if (oldRating == null)
+							oldRating = 0;
+						int newRating;
+						try {
+							newRating = Math.addExact(oldRating, game.getRating());
+						} catch (ArithmeticException e) {
+							newRating = Integer.MAX_VALUE;
+						}
+						rating.put(playerName, newRating);
+						try {
+							rationDao.serialize(rating);
+						} catch (IOException e) {
+							MultiStatus status = createMultiStatus(e.getLocalizedMessage(), e);
+							 ErrorDialog.openError(
+									 activeShell,
+									 "Error",
+									 "Failed to save your rating",
+									 status);
+						}
+						
 						MPart ratingPart = partService.findPart("com.noname.guess.number.rating");
 						if (ratingPart != null) {
 							partService.activate(ratingPart);	
@@ -189,6 +232,23 @@ public class GamePart {
 	@Persist
 	public void save() {
 	}
+	
+	private static MultiStatus createMultiStatus(String msg, Throwable t) {
+
+	    List<Status> childStatuses = new ArrayList<>();
+	    StackTraceElement[] stackTraces = Thread.currentThread().getStackTrace();
+
+	     for (StackTraceElement stackTrace: stackTraces) {
+	      Status status = new Status(IStatus.ERROR,
+	          "com.example.e4.rcp.todo", stackTrace.toString());
+	      childStatuses.add(status);
+	    }
+
+	    MultiStatus ms = new MultiStatus("com.example.e4.rcp.todo",
+	        IStatus.ERROR, childStatuses.toArray(new Status[] {}),
+	        t.toString(), t);
+	    return ms;
+	  }
 
 	private class GameEventListenerImpl implements GameEventListener {
 		private final Composite parentComposite;

@@ -5,4 +5,5 @@ Bundle-SymbolicName: com.noname.guess.number.core
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: NONAME
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Export-Package: com.noname.guess.number.core
+Export-Package: com.noname.guess.number.core,
+ com.noname.guess.number.core.dao

@@ -2,8 +2,6 @@ package com.noname.guess.number.core;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class GuessNumberGameImpl implements GuessNumberGame {
@@ -19,23 +17,17 @@ public class GuessNumberGameImpl implements GuessNumberGame {
 	private int binarySearchAttempts;
 	private int bruteforcePenalty;
 	
-	private SortedSet<Player> sortedPlayers = new TreeSet<>();
-	
-	public GuessNumberGameImpl() {
-		
-	}
-
 	@Override
 	public void start(GuessNumberLevel level) {
 		isInProgress = true;
-		rating = ratingMax + NORMAL_PENALTY;
-		attempts = 0;
 		int lowerBound = level.getLowerBound(); 
 		int upperBound = level.getUpperBound();
 		number = ThreadLocalRandom.current().nextInt(
 				lowerBound,
 				upperBound + 1);
 		ratingMax = upperBound - lowerBound;
+		rating = ratingMax + NORMAL_PENALTY;
+		attempts = 0;
 		binarySearchAttempts = (int)Math.ceil(Math.log(ratingMax) / LOG_2);
 		int bruteforceAttempts = ratingMax - binarySearchAttempts;
 		int bruteforcePenalty = bruteforceAttempts / 10;  
@@ -98,10 +90,4 @@ public class GuessNumberGameImpl implements GuessNumberGame {
 	public int getRating() {
 		return rating;
 	}
-	
-	@Override
-	public SortedSet<Player> getSortedPlayers() {
-		return sortedPlayers;
-	}
-
 }
