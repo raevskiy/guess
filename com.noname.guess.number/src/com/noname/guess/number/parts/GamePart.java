@@ -176,8 +176,10 @@ public class GamePart {
 					if (dlg.open() == Window.OK) {
 						String playerName = dlg.getValue();
 						Integer oldRating = rating.get(playerName);
-						if (oldRating == null)
+						if (oldRating == null) {
 							oldRating = 0;
+						}
+							
 						int newRating;
 						try {
 							newRating = Math.addExact(oldRating, game.getRating());
@@ -198,6 +200,7 @@ public class GamePart {
 						
 						MPart ratingPart = partService.findPart("com.noname.guess.number.rating");
 						if (ratingPart != null) {
+							((RatingPart)ratingPart.getObject()).update(rating);
 							partService.activate(ratingPart);	
 						}
 					}
