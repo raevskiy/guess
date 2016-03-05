@@ -17,6 +17,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 
 import com.noname.guess.number.core.GuessNumberGame;
+import com.noname.guess.number.i18n.Messages;
 
 
 public class QuitHandler {
@@ -28,8 +29,8 @@ public class QuitHandler {
 		if (!game.isInProgress() 
 				|| MessageDialog.openConfirm(
 						shell,
-						"Exit confirmation",
-						"All progress in current game will be lost. Really exit?")) {
+						Messages.QuitHandler_ConfirmationTitle,
+						Messages.QuitHandler_ConfirmationMessage)) {
 			workbench.close();
 		}
 	}

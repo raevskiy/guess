@@ -13,6 +13,9 @@ public class GuessNumberLevelImpl implements GuessNumberLevel {
 			throw new IllegalArgumentException("Upper cannot be null");
 		if (upperBound < lowerBound)
 			throw new IllegalArgumentException("Upper bound cannot be less then lower bound");
+		if (upperBound < 0 || lowerBound < 0)
+			throw new IllegalArgumentException("Upper and lower bound cannot be negative");
+
 		this.lowerBound = lowerBound;
 		this.upperBound = upperBound;
 		this.name = name;

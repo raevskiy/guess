@@ -20,18 +20,19 @@ import com.noname.guess.number.core.GuessNumberLevel;
 import com.noname.guess.number.core.GuessNumberLevelImpl;
 import com.noname.guess.number.core.dao.RatingDao;
 import com.noname.guess.number.core.dao.RatingDaoImpl;
+import com.noname.guess.number.i18n.Messages;
 
 public class GuessNumberAddon {
-	public static final String RATING_KEY = "rating";
-	public static final String DEFAULT_LEVEL_KEY = "default";
+	public static final String RATING_KEY = "rating"; //$NON-NLS-1$
+	public static final String DEFAULT_LEVEL_KEY = "default"; //$NON-NLS-1$
 	
 	@PostConstruct
 	public void postCostConstruct(IEclipseContext context,
 			@SuppressWarnings("restriction") @Named(E4Workbench.INSTANCE_LOCATION) Location instanceLocation) throws UnsupportedEncodingException {
 		GuessNumberLevel[] levels = new GuessNumberLevel[3];
-		levels[0] = new GuessNumberLevelImpl("Easy", 0, 9);
-		levels[1] = new GuessNumberLevelImpl("Medium", 0, 99);
-		levels[2] = new GuessNumberLevelImpl("Hard", 0, 999);
+		levels[0] = new GuessNumberLevelImpl(Messages.GuessNumberAddon_LevelEasy, 0, 9);
+		levels[1] = new GuessNumberLevelImpl(Messages.GuessNumberAddon_LevelMedium, 0, 99);
+		levels[2] = new GuessNumberLevelImpl(Messages.GuessNumberAddon_LevelHard, 0, 999);
 		context.set(GuessNumberLevel[].class, levels);
 		context.set(DEFAULT_LEVEL_KEY, levels[1]);
 
@@ -39,8 +40,8 @@ public class GuessNumberAddon {
 		context.set(GuessNumberGame.class, game);
 		
 		URL url = instanceLocation.getURL();
-		File workspaceDir = new File( URLDecoder.decode( url.getFile(), "UTF-8" ) );
-		File ratingFile = new File(workspaceDir, "rating");
+		File workspaceDir = new File( URLDecoder.decode( url.getFile(), "UTF-8" ) ); //$NON-NLS-1$
+		File ratingFile = new File(workspaceDir, "rating"); //$NON-NLS-1$
 		RatingDao ratingDao = new RatingDaoImpl(ratingFile);
 		context.set(RatingDao.class, ratingDao);
 		

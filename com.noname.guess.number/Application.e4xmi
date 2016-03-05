@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:advanced="http://www.eclipse.org/ui/2010/UIModel/application/ui/advanced" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_LoA6MNzNEeWT_dg7TtxjFA" elementId="org.eclipse.e4.ide.application" bindingContexts="_LoBhQNzNEeWT_dg7TtxjFA">
-  <children xsi:type="basic:TrimmedWindow" xmi:id="_LoA6MdzNEeWT_dg7TtxjFA" label="com.noname.guess.number" width="500" height="400">
+  <children xsi:type="basic:TrimmedWindow" xmi:id="_LoA6MdzNEeWT_dg7TtxjFA" label="%trimmedwindow.label.1" width="500" height="400">
     <children xsi:type="advanced:PerspectiveStack" xmi:id="_LoBhV9zNEeWT_dg7TtxjFA">
       <children xsi:type="advanced:Perspective" xmi:id="_LoBhWNzNEeWT_dg7TtxjFA">
         <children xsi:type="basic:PartSashContainer" xmi:id="_LoBhWdzNEeWT_dg7TtxjFA">
           <children xsi:type="basic:PartStack" xmi:id="_LoCIUNzNEeWT_dg7TtxjFA">
-            <children xsi:type="basic:Part" xmi:id="_LoCIUdzNEeWT_dg7TtxjFA" elementId="com.noname.guess.number.game" contributionURI="bundleclass://com.noname.guess.number/com.noname.guess.number.parts.GamePart" label="Game"/>
-            <children xsi:type="basic:Part" xmi:id="_QL1T8N0rEeWH-f9x4uY3CQ" elementId="com.noname.guess.number.rating" contributionURI="bundleclass://com.noname.guess.number/com.noname.guess.number.parts.RatingPart" label="Rating"/>
+            <children xsi:type="basic:Part" xmi:id="_LoCIUdzNEeWT_dg7TtxjFA" elementId="com.noname.guess.number.game" contributionURI="bundleclass://com.noname.guess.number/com.noname.guess.number.parts.GamePart" label="%part.label.1"/>
+            <children xsi:type="basic:Part" xmi:id="_QL1T8N0rEeWH-f9x4uY3CQ" elementId="com.noname.guess.number.rating" contributionURI="bundleclass://com.noname.guess.number/com.noname.guess.number.parts.RatingPart" label="%part.label.2"/>
           </children>
         </children>
       </children>
     </children>
     <mainMenu xmi:id="_LoBhUNzNEeWT_dg7TtxjFA" elementId="menu:org.eclipse.ui.main.menu">
-      <children xsi:type="menu:Menu" xmi:id="_LoBhUdzNEeWT_dg7TtxjFA" label="Game">
-        <children xsi:type="menu:HandledMenuItem" xmi:id="_LoBhVNzNEeWT_dg7TtxjFA" label="Quit" command="_LoBhQ9zNEeWT_dg7TtxjFA"/>
+      <children xsi:type="menu:Menu" xmi:id="_LoBhUdzNEeWT_dg7TtxjFA" label="%menu.label.1">
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_LoBhVNzNEeWT_dg7TtxjFA" label="%handledmenuitem.label.1" command="_LoBhQ9zNEeWT_dg7TtxjFA"/>
       </children>
-      <children xsi:type="menu:Menu" xmi:id="_LoBhVdzNEeWT_dg7TtxjFA" label="Help">
-        <children xsi:type="menu:HandledMenuItem" xmi:id="_LoBhVtzNEeWT_dg7TtxjFA" label="About" command="_LoBhTdzNEeWT_dg7TtxjFA"/>
+      <children xsi:type="menu:Menu" xmi:id="_LoBhVdzNEeWT_dg7TtxjFA" label="%menu.label.2">
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_LoBhVtzNEeWT_dg7TtxjFA" label="%handledmenuitem.label.2" command="_LoBhTdzNEeWT_dg7TtxjFA"/>
       </children>
     </mainMenu>
   </children>
@@ -32,8 +32,8 @@
     <children xmi:id="_LoBhQdzNEeWT_dg7TtxjFA" elementId="org.eclipse.ui.contexts.window" name="In Windows"/>
     <children xmi:id="_LoBhQtzNEeWT_dg7TtxjFA" elementId="org.eclipse.ui.contexts.dialog" name="In Dialogs"/>
   </rootContext>
-  <commands xmi:id="_LoBhQ9zNEeWT_dg7TtxjFA" elementId="org.eclipse.ui.file.exit" commandName="quitCommand"/>
-  <commands xmi:id="_LoBhTdzNEeWT_dg7TtxjFA" elementId="org.eclipse.ui.help.aboutAction" commandName="aboutCommand"/>
+  <commands xmi:id="_LoBhQ9zNEeWT_dg7TtxjFA" elementId="org.eclipse.ui.file.exit" commandName="%command.commandname.1"/>
+  <commands xmi:id="_LoBhTdzNEeWT_dg7TtxjFA" elementId="org.eclipse.ui.help.aboutAction" commandName="%command.commandname.2"/>
   <addons xmi:id="_LoA6MtzNEeWT_dg7TtxjFA" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
   <addons xmi:id="_LoA6M9zNEeWT_dg7TtxjFA" elementId="org.eclipse.e4.ui.contexts.service" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
   <addons xmi:id="_LoA6NNzNEeWT_dg7TtxjFA" elementId="org.eclipse.e4.ui.bindings.service" contributionURI="bundleclass://org.eclipse.e4.ui.bindings/org.eclipse.e4.ui.bindings.BindingServiceAddon"/>

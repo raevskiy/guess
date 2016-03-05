@@ -53,6 +53,7 @@ import com.noname.guess.number.core.GameEventListener;
 import com.noname.guess.number.core.GuessNumberGame;
 import com.noname.guess.number.core.GuessNumberLevel;
 import com.noname.guess.number.core.dao.RatingDao;
+import com.noname.guess.number.i18n.Messages;
 
 public class GamePart {
 	private Composite introComposite;
@@ -97,7 +98,7 @@ public class GamePart {
 
 		// Create the first Group
 		Group groupLevel = new Group(introComposite, SWT.SHADOW_IN);
-		groupLevel.setText("Difficulty level");
+		groupLevel.setText(Messages.GamePart_Difficulty);
 		groupLevel.setLayout(new RowLayout(SWT.VERTICAL));
 		for (final GuessNumberLevel level : levels) {
 			Button buttonLevel = new Button(groupLevel, SWT.RADIO);
@@ -121,7 +122,7 @@ public class GamePart {
 		groupLevel.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		buttonStart = new Button(introComposite, SWT.PUSH);
-		buttonStart.setText("Start");
+		buttonStart.setText(Messages.GamePart_StartGame);
 		buttonStart.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		buttonStart.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -139,10 +140,10 @@ public class GamePart {
 				try {
 					Integer newInteger = Integer.parseInt(spinnerGuessValue.getText());
 					if (newInteger <= spinnerGuessValue.getMaximum() && newInteger >= spinnerGuessValue.getMinimum()) {
-						labelOutcome.setText("");
+						labelOutcome.setText(""); //$NON-NLS-1$
 						buttonGuess.setEnabled(true);
 					} else {
-						StringBuilder sb = new StringBuilder("Please use a value in the the range");
+						StringBuilder sb = new StringBuilder(Messages.GamePart_RangeHint);
 						addBoundaries(sb, selectedLevel);
 						labelOutcome.setText(sb.toString());
 						buttonGuess.setEnabled(false);
@@ -155,33 +156,33 @@ public class GamePart {
 
 		labelOutcome = new Label(gameComposite, SWT.NONE);
 		labelOutcome.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		labelOutcome.setText("");
+		labelOutcome.setText(""); //$NON-NLS-1$
 
 		buttonGuess = new Button(gameComposite, SWT.PUSH);
-		buttonGuess.setText("Try this");
+		buttonGuess.setText(Messages.GamePart_TryNumber);
 		buttonGuess.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		buttonGuess.addSelectionListener(new GuessSelectionAdapter());
 
 		Button buttonSurrender = new Button(gameComposite, SWT.PUSH);
-		buttonSurrender.setText("Surrender");
+		buttonSurrender.setText(Messages.GamePart_Surrender);
 		buttonSurrender.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		buttonSurrender.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				int number = game.cancel();
-				MessageDialog.openInformation(Display.getCurrent().getActiveShell(), "Game is cancelled",
-						"In fact, it was " + number);
+				MessageDialog.openInformation(Display.getCurrent().getActiveShell(), Messages.GamePart_GameCancelled,
+						Messages.GamePart_RightAnswer + number);
 			}
 		});
 
 	}
 
 	private void addBoundaries(StringBuilder sb, GuessNumberLevel level) {
-		sb.append(" [");
+		sb.append(" ["); //$NON-NLS-1$
 		sb.append(level.getLowerBound());
-		sb.append(", ");
+		sb.append(", "); //$NON-NLS-1$
 		sb.append(level.getUpperBound());
-		sb.append("]");
+		sb.append("]"); //$NON-NLS-1$
 	}
 
 	@Focus
@@ -212,8 +213,8 @@ public class GamePart {
 			MultiStatus status = createMultiStatus(e.getLocalizedMessage(), e);
 			ErrorDialog.openError(
 					Display.getCurrent().getActiveShell(),
-					"Error",
-					"Failed to save your rating",
+					Messages.GamePart_SerializeErrorTitle,
+					Messages.GamePart_SerializeErrorMessage,
 					status);
 		}
 	}
@@ -221,17 +222,18 @@ public class GamePart {
 	private static MultiStatus createMultiStatus(String msg, Throwable t) {
 		List<Status> childStatuses = new ArrayList<>();
 		StackTraceElement[] stackTraces = Thread.currentThread().getStackTrace();
+		String pluginId = "com.noname.guess.number"; //$NON-NLS-1$
 
 		for (StackTraceElement stackTrace : stackTraces) {
 			Status status = new Status(
 					IStatus.ERROR,
-					"com.noname.guess.number",
+					pluginId, 
 					stackTrace.toString());
 			childStatuses.add(status);
 		}
 
 		MultiStatus ms = new MultiStatus(
-				"com.example.e4.rcp.todo",
+				pluginId,
 				IStatus.ERROR,
 				childStatuses.toArray(new Status[] {}),
 				t.toString(),
@@ -286,9 +288,9 @@ public class GamePart {
 		public String isValid(String newText) {
 			int len = newText.length();
 			if (len < 1)
-				return "Too short";
+				return Messages.GamePart_PlayerNameTooShort;
 			if (len > 20)
-				return "Too long";
+				return Messages.GamePart_PlayerNameTooLong;
 			return null;
 		}
 	}
@@ -304,21 +306,21 @@ public class GamePart {
 			int supposedValue = spinnerGuessValue.getSelection();
 			int outcome = game.guess(supposedValue);
 			if (outcome < 0) {
-				labelOutcome.setText("The number is greater then " + supposedValue);
+				labelOutcome.setText(Messages.GamePart_Greater + supposedValue);
 			} else if (outcome > 0) {
-				labelOutcome.setText("The number is less then " + supposedValue);
+				labelOutcome.setText(Messages.GamePart_Less + supposedValue);
 			} else {
 				Shell activeShell = Display.getCurrent().getActiveShell();
 				InputDialog dlg = new InputDialog(
 						activeShell,
-						"Well done. Total attempts: " + game.getAttempts(),
-						"Enter your name",
-						"Player",
+						Messages.GamePart_VictoryTitle + game.getAttempts(),
+						Messages.GamePart_InputPlayerName,
+						Messages.GamePart_DefaultPlayerName,
 						new PlayerNameValidator());
 				if (dlg.open() == Window.OK) {
 					updateRating(dlg.getValue());
 
-					MPart ratingPart = partService.findPart("com.noname.guess.number.rating");
+					MPart ratingPart = partService.findPart("com.noname.guess.number.rating"); //$NON-NLS-1$
 					if (ratingPart != null) {
 						partService.activate(ratingPart);
 						((RatingPart)ratingPart.getObject()).update(rating);

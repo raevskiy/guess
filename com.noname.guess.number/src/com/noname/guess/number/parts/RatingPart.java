@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 
 import com.noname.guess.number.addons.GuessNumberAddon;
+import com.noname.guess.number.i18n.Messages;
 
 public class RatingPart {
 	private TableViewer tableViewerRating;
@@ -41,7 +42,7 @@ public class RatingPart {
 
 		TableViewerColumn colName = new TableViewerColumn(tableViewerRating, SWT.NONE);
 		colName.getColumn().setWidth(200);
-		colName.getColumn().setText("Name");
+		colName.getColumn().setText(Messages.RatingPart_PlayerName);
 		colName.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -52,7 +53,7 @@ public class RatingPart {
 
 		TableViewerColumn colRating = new TableViewerColumn(tableViewerRating, SWT.NONE);
 		colRating.getColumn().setWidth(200);
-		colRating.getColumn().setText("Rating");
+		colRating.getColumn().setText(Messages.RatingPart_PlayerRating);
 		colRating.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
