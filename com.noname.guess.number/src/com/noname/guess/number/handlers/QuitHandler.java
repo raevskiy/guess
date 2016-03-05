@@ -16,12 +16,20 @@ import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 
+import com.noname.guess.number.core.GuessNumberGame;
+
 
 public class QuitHandler {
 	@Execute
-	public void execute(IWorkbench workbench, Shell shell){
-		if (MessageDialog.openConfirm(shell, "Confirmation",
-				"Do you want to exit?")) {
+	public void execute(
+			GuessNumberGame game,
+			IWorkbench workbench,
+			Shell shell){
+		if (!game.isInProgress() 
+				|| MessageDialog.openConfirm(
+						shell,
+						"Exit confirmation",
+						"All progress in current game will be lost. Really exit?")) {
 			workbench.close();
 		}
 	}

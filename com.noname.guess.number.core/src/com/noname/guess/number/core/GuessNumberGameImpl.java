@@ -2,7 +2,9 @@ package com.noname.guess.number.core;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
+
+import com.noname.guess.number.core.random.DefaultRandomGenerator;
+import com.noname.guess.number.core.random.RandomGenerator;
 
 public class GuessNumberGameImpl implements GuessNumberGame {
 	private static final double LOG_2 = Math.log(2);
@@ -11,22 +13,33 @@ public class GuessNumberGameImpl implements GuessNumberGame {
 	private int attempts;
 	private boolean isInProgress;
 	private List<GameEventListener> listeners = new ArrayList<>();
+	private RandomGenerator randomGenerator;
 	
 	private int rating;
 	private int ratingMax;
 	private int binarySearchAttempts;
 	private int bruteforcePenalty;
 	
+	public GuessNumberGameImpl() {
+		this(new DefaultRandomGenerator());
+	}
+	
+	public GuessNumberGameImpl(RandomGenerator randomGenerator) {
+		this.randomGenerator = randomGenerator;
+	}
+
+	
 	@Override
 	public void start(GuessNumberLevel level) {
+		if (isInProgress)
+			cancel();
+
 		isInProgress = true;
 		int lowerBound = level.getLowerBound(); 
 		int upperBound = level.getUpperBound();
-		number = ThreadLocalRandom.current().nextInt(
-				lowerBound,
-				upperBound + 1);
+		number = randomGenerator.generateRandomInt(lowerBound, upperBound);
 		ratingMax = upperBound - lowerBound;
-		rating = ratingMax + NORMAL_PENALTY;
+		rating = ratingMax;
 		attempts = 0;
 		binarySearchAttempts = (int)Math.ceil(Math.log(ratingMax) / LOG_2);
 		int bruteforceAttempts = ratingMax - binarySearchAttempts;
@@ -34,15 +47,21 @@ public class GuessNumberGameImpl implements GuessNumberGame {
 		this.bruteforcePenalty = (bruteforcePenalty >= NORMAL_PENALTY) ? bruteforcePenalty : NORMAL_PENALTY;
 		
 		for (GameEventListener listener : listeners)
-			listener.onGameStrated();
+			listener.onGameStarted();
 	}
 
 	@Override
-	public void cancel() {
+	public int cancel() {
 		validateProgress();
 		
 		rating = 0;
 		stop();
+		return number;
+	}
+	
+	@Override
+	public boolean isInProgress() {
+		return isInProgress;
 	}
 	
 	private void stop() {
@@ -61,13 +80,18 @@ public class GuessNumberGameImpl implements GuessNumberGame {
 		validateProgress();
 		
 		attempts++;
-		int penalty = (attempts <= binarySearchAttempts) ? NORMAL_PENALTY : bruteforcePenalty;
-		rating -= penalty;
-		rating = Math.max(rating, 1);
+		//The first attempt has no penalty
+		if (attempts > 1) {
+			int penalty = (attempts <= binarySearchAttempts) ? NORMAL_PENALTY : bruteforcePenalty;
+			rating -= penalty;
+			rating = Math.max(rating, 1);
+		};
 
-		int outcome = value - number;
-		if (outcome == 0)
+		//hide the difference to prevent abuse
+		int outcome = Integer.signum(value - number);
+		if (outcome == 0) {
 			stop();
+		}
 		return outcome;
 	}
 

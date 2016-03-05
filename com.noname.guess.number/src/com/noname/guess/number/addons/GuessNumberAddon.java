@@ -23,14 +23,17 @@ import com.noname.guess.number.core.dao.RatingDaoImpl;
 
 public class GuessNumberAddon {
 	public static final String RATING_KEY = "rating";
+	public static final String DEFAULT_LEVEL_KEY = "default";
 	
 	@PostConstruct
-	public void postCostConstruct(IEclipseContext context, @SuppressWarnings("restriction") @Named(E4Workbench.INSTANCE_LOCATION) Location instanceLocation) throws UnsupportedEncodingException {
+	public void postCostConstruct(IEclipseContext context,
+			@SuppressWarnings("restriction") @Named(E4Workbench.INSTANCE_LOCATION) Location instanceLocation) throws UnsupportedEncodingException {
 		GuessNumberLevel[] levels = new GuessNumberLevel[3];
 		levels[0] = new GuessNumberLevelImpl("Easy", 0, 9);
-		levels[1] = new GuessNumberLevelImpl("Medium", 0, 99, true);
+		levels[1] = new GuessNumberLevelImpl("Medium", 0, 99);
 		levels[2] = new GuessNumberLevelImpl("Hard", 0, 999);
 		context.set(GuessNumberLevel[].class, levels);
+		context.set(DEFAULT_LEVEL_KEY, levels[1]);
 
 		GuessNumberGame game = new GuessNumberGameImpl();
 		context.set(GuessNumberGame.class, game);

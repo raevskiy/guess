@@ -30,6 +30,7 @@ import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -54,7 +55,6 @@ import com.noname.guess.number.core.GuessNumberLevel;
 import com.noname.guess.number.core.dao.RatingDao;
 
 public class GamePart {
-
 	private Composite introComposite;
 	private Composite gameComposite;
 	private Spinner spinnerGuessValue;
@@ -63,18 +63,21 @@ public class GamePart {
 	private Button buttonGuess;
 
 	@Inject
-	RatingDao rationDao;
+	EPartService partService;
+	@Inject
+	RatingDao ratingDao;
 	@Inject
 	@Named(GuessNumberAddon.RATING_KEY)
 	private Map<String, Integer> rating;
 	@Inject
 	private GuessNumberGame game;
-	@Inject
-	private GuessNumberLevel[] levels;
 	private GuessNumberLevel selectedLevel;
 
 	@PostConstruct
-	public void createComposite(Composite parent, EPartService partService) {
+	public void createComposite(
+			Composite parent,
+			GuessNumberLevel[] levels,
+			@Named(GuessNumberAddon.DEFAULT_LEVEL_KEY) GuessNumberLevel defaultLevel) {
 		game.addGameEventListener(new GameEventListenerImpl(parent));
 
 		parent.setLayout(new GridLayout(1, false));
@@ -110,7 +113,7 @@ public class GamePart {
 				}
 			});
 
-			if (level.isDefault()) {
+			if (level.equals(defaultLevel)) {
 				buttonLevel.setSelection(true);
 				selectedLevel = level;
 			}
@@ -145,7 +148,7 @@ public class GamePart {
 						buttonGuess.setEnabled(false);
 					}
 				} catch (NumberFormatException e) {
-					//NOP
+					// NOP
 				}
 			}
 		});
@@ -157,56 +160,7 @@ public class GamePart {
 		buttonGuess = new Button(gameComposite, SWT.PUSH);
 		buttonGuess.setText("Try this");
 		buttonGuess.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		buttonGuess.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent event) {
-				int supposedValue = spinnerGuessValue.getSelection();
-				int outcome = game.guess(supposedValue);
-				if (outcome < 0) {
-					labelOutcome.setText("The number is greater then " + supposedValue);
-				} else if (outcome > 0) {
-					labelOutcome.setText("The number is less then " + supposedValue);
-				} else {
-					Shell activeShell = Display.getCurrent().getActiveShell();
-					InputDialog dlg = new InputDialog(activeShell,
-							"Well done. Total attempts: " + game.getAttempts(),
-							"Enter your name",
-							"Player",
-							new LengthValidator());
-					if (dlg.open() == Window.OK) {
-						String playerName = dlg.getValue();
-						Integer oldRating = rating.get(playerName);
-						if (oldRating == null) {
-							oldRating = 0;
-						}
-							
-						int newRating;
-						try {
-							newRating = Math.addExact(oldRating, game.getRating());
-						} catch (ArithmeticException e) {
-							newRating = Integer.MAX_VALUE;
-						}
-						rating.put(playerName, newRating);
-						try {
-							rationDao.serialize(rating);
-						} catch (IOException e) {
-							MultiStatus status = createMultiStatus(e.getLocalizedMessage(), e);
-							 ErrorDialog.openError(
-									 activeShell,
-									 "Error",
-									 "Failed to save your rating",
-									 status);
-						}
-						
-						MPart ratingPart = partService.findPart("com.noname.guess.number.rating");
-						if (ratingPart != null) {
-							((RatingPart)ratingPart.getObject()).update(rating);
-							partService.activate(ratingPart);	
-						}
-					}
-				}
-			}
-		});
+		buttonGuess.addSelectionListener(new GuessSelectionAdapter());
 
 		Button buttonSurrender = new Button(gameComposite, SWT.PUSH);
 		buttonSurrender.setText("Surrender");
@@ -214,7 +168,9 @@ public class GamePart {
 		buttonSurrender.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				game.cancel();
+				int number = game.cancel();
+				MessageDialog.openInformation(Display.getCurrent().getActiveShell(), "Game is cancelled",
+						"In fact, it was " + number);
 			}
 		});
 
@@ -236,23 +192,58 @@ public class GamePart {
 	public void save() {
 	}
 	
+	private void updateRating(String playerName) {
+		Integer oldRating = rating.get(playerName);
+		if (oldRating == null) {
+			oldRating = 0;
+		}
+
+		int newRating;
+		try {
+			newRating = Math.addExact(oldRating, game.getRating());
+		} catch (ArithmeticException e) {
+			newRating = Integer.MAX_VALUE;
+		}
+		rating.put(playerName, newRating);
+		
+		try {
+			ratingDao.serialize(rating);
+		} catch (IOException e) {
+			MultiStatus status = createMultiStatus(e.getLocalizedMessage(), e);
+			ErrorDialog.openError(
+					Display.getCurrent().getActiveShell(),
+					"Error",
+					"Failed to save your rating",
+					status);
+		}
+	}
+
 	private static MultiStatus createMultiStatus(String msg, Throwable t) {
+		List<Status> childStatuses = new ArrayList<>();
+		StackTraceElement[] stackTraces = Thread.currentThread().getStackTrace();
 
-	    List<Status> childStatuses = new ArrayList<>();
-	    StackTraceElement[] stackTraces = Thread.currentThread().getStackTrace();
+		for (StackTraceElement stackTrace : stackTraces) {
+			Status status = new Status(
+					IStatus.ERROR,
+					"com.noname.guess.number",
+					stackTrace.toString());
+			childStatuses.add(status);
+		}
 
-	     for (StackTraceElement stackTrace: stackTraces) {
-	      Status status = new Status(IStatus.ERROR,
-	          "com.example.e4.rcp.todo", stackTrace.toString());
-	      childStatuses.add(status);
-	    }
+		MultiStatus ms = new MultiStatus(
+				"com.example.e4.rcp.todo",
+				IStatus.ERROR,
+				childStatuses.toArray(new Status[] {}),
+				t.toString(),
+				t);
+		return ms;
+	}
 
-	    MultiStatus ms = new MultiStatus("com.example.e4.rcp.todo",
-	        IStatus.ERROR, childStatuses.toArray(new Status[] {}),
-	        t.toString(), t);
-	    return ms;
-	  }
-
+	/**
+	 * Game events' listener that adjusts SWT widgets
+	 * @author Северин
+	 *
+	 */
 	private class GameEventListenerImpl implements GameEventListener {
 		private final Composite parentComposite;
 
@@ -271,12 +262,11 @@ public class GamePart {
 		}
 
 		@Override
-		public void onGameStrated() {
+		public void onGameStarted() {
 			int lowerBound = selectedLevel.getLowerBound();
 			spinnerGuessValue.setMinimum(lowerBound);
 			spinnerGuessValue.setMaximum(selectedLevel.getUpperBound());
 			spinnerGuessValue.setSelection(lowerBound);
-
 			manageCompositeVisibility(false, true);
 		}
 
@@ -286,7 +276,12 @@ public class GamePart {
 		}
 	}
 
-	private class LengthValidator implements IInputValidator {
+	/**
+	 * Validates player's name
+	 * @author Северин
+	 *
+	 */
+	private class PlayerNameValidator implements IInputValidator {
 		@Override
 		public String isValid(String newText) {
 			int len = newText.length();
@@ -295,6 +290,41 @@ public class GamePart {
 			if (len > 20)
 				return "Too long";
 			return null;
+		}
+	}
+	
+	/**
+	 * Guess button adapter
+	 * @author Северин
+	 *
+	 */
+	private class GuessSelectionAdapter extends SelectionAdapter {
+		@Override
+		public void widgetSelected(SelectionEvent event) {
+			int supposedValue = spinnerGuessValue.getSelection();
+			int outcome = game.guess(supposedValue);
+			if (outcome < 0) {
+				labelOutcome.setText("The number is greater then " + supposedValue);
+			} else if (outcome > 0) {
+				labelOutcome.setText("The number is less then " + supposedValue);
+			} else {
+				Shell activeShell = Display.getCurrent().getActiveShell();
+				InputDialog dlg = new InputDialog(
+						activeShell,
+						"Well done. Total attempts: " + game.getAttempts(),
+						"Enter your name",
+						"Player",
+						new PlayerNameValidator());
+				if (dlg.open() == Window.OK) {
+					updateRating(dlg.getValue());
+
+					MPart ratingPart = partService.findPart("com.noname.guess.number.rating");
+					if (ratingPart != null) {
+						partService.activate(ratingPart);
+						((RatingPart)ratingPart.getObject()).update(rating);
+					}
+				}
+			}
 		}
 	}
 }

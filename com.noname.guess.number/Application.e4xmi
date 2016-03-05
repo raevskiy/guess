@@ -12,30 +12,20 @@
       </children>
     </children>
     <mainMenu xmi:id="_LoBhUNzNEeWT_dg7TtxjFA" elementId="menu:org.eclipse.ui.main.menu">
-      <children xsi:type="menu:Menu" xmi:id="_LoBhUdzNEeWT_dg7TtxjFA" label="File">
-        <children xsi:type="menu:HandledMenuItem" xmi:id="_LoBhUtzNEeWT_dg7TtxjFA" label="Open" iconURI="platform:/plugin/com.noname.guess.number/icons/sample.png" command="_LoBhR9zNEeWT_dg7TtxjFA"/>
-        <children xsi:type="menu:HandledMenuItem" xmi:id="_LoBhU9zNEeWT_dg7TtxjFA" label="Save" iconURI="platform:/plugin/com.noname.guess.number/icons/save_edit.png" command="_LoBhStzNEeWT_dg7TtxjFA"/>
+      <children xsi:type="menu:Menu" xmi:id="_LoBhUdzNEeWT_dg7TtxjFA" label="Game">
         <children xsi:type="menu:HandledMenuItem" xmi:id="_LoBhVNzNEeWT_dg7TtxjFA" label="Quit" command="_LoBhQ9zNEeWT_dg7TtxjFA"/>
       </children>
       <children xsi:type="menu:Menu" xmi:id="_LoBhVdzNEeWT_dg7TtxjFA" label="Help">
         <children xsi:type="menu:HandledMenuItem" xmi:id="_LoBhVtzNEeWT_dg7TtxjFA" label="About" command="_LoBhTdzNEeWT_dg7TtxjFA"/>
       </children>
     </mainMenu>
-    <trimBars xmi:id="_LoCIUtzNEeWT_dg7TtxjFA">
-      <children xsi:type="menu:ToolBar" xmi:id="_LoCIU9zNEeWT_dg7TtxjFA" elementId="toolbar:org.eclipse.ui.main.toolbar">
-        <children xsi:type="menu:HandledToolItem" xmi:id="_LoCIVNzNEeWT_dg7TtxjFA" iconURI="platform:/plugin/com.noname.guess.number/icons/sample.png" command="_LoBhR9zNEeWT_dg7TtxjFA"/>
-        <children xsi:type="menu:HandledToolItem" xmi:id="_LoCIVdzNEeWT_dg7TtxjFA" iconURI="platform:/plugin/com.noname.guess.number/icons/save_edit.png" command="_LoBhStzNEeWT_dg7TtxjFA"/>
-      </children>
-    </trimBars>
   </children>
   <handlers xmi:id="_LoBhRNzNEeWT_dg7TtxjFA" elementId="com.noname.guess.number.handler.quitCommand" contributionURI="bundleclass://com.noname.guess.number/com.noname.guess.number.handlers.QuitHandler" command="_LoBhQ9zNEeWT_dg7TtxjFA"/>
-  <handlers xmi:id="_LoBhSNzNEeWT_dg7TtxjFA" elementId="com.noname.guess.number.handler.openCommand" contributionURI="bundleclass://com.noname.guess.number/com.noname.guess.number.handlers.OpenHandler" command="_LoBhR9zNEeWT_dg7TtxjFA"/>
-  <handlers xmi:id="_LoBhS9zNEeWT_dg7TtxjFA" elementId="com.noname.guess.number.handler.saveCommand" contributionURI="bundleclass://com.noname.guess.number/com.noname.guess.number.handlers.SaveHandler" command="_LoBhStzNEeWT_dg7TtxjFA"/>
   <handlers xmi:id="_LoBhTtzNEeWT_dg7TtxjFA" elementId="com.noname.guess.number.handler.aboutCommand" contributionURI="bundleclass://com.noname.guess.number/com.noname.guess.number.handlers.AboutHandler" command="_LoBhTdzNEeWT_dg7TtxjFA"/>
   <bindingTables xmi:id="_LoBhRdzNEeWT_dg7TtxjFA" bindingContext="_LoBhQNzNEeWT_dg7TtxjFA">
     <bindings xmi:id="_LoBhRtzNEeWT_dg7TtxjFA" keySequence="M1+Q" command="_LoBhQ9zNEeWT_dg7TtxjFA"/>
-    <bindings xmi:id="_LoBhSdzNEeWT_dg7TtxjFA" keySequence="M1+O" command="_LoBhR9zNEeWT_dg7TtxjFA"/>
-    <bindings xmi:id="_LoBhTNzNEeWT_dg7TtxjFA" keySequence="M1+S" command="_LoBhStzNEeWT_dg7TtxjFA"/>
+    <bindings xmi:id="_LoBhSdzNEeWT_dg7TtxjFA" keySequence="M1+O"/>
+    <bindings xmi:id="_LoBhTNzNEeWT_dg7TtxjFA" keySequence="M1+S"/>
     <bindings xmi:id="_LoBhT9zNEeWT_dg7TtxjFA" keySequence="M1+A" command="_LoBhTdzNEeWT_dg7TtxjFA"/>
   </bindingTables>
   <rootContext xmi:id="_LoBhQNzNEeWT_dg7TtxjFA" elementId="org.eclipse.ui.contexts.dialogAndWindow" name="In Dialog and Windows">
@@ -43,8 +33,6 @@
     <children xmi:id="_LoBhQtzNEeWT_dg7TtxjFA" elementId="org.eclipse.ui.contexts.dialog" name="In Dialogs"/>
   </rootContext>
   <commands xmi:id="_LoBhQ9zNEeWT_dg7TtxjFA" elementId="org.eclipse.ui.file.exit" commandName="quitCommand"/>
-  <commands xmi:id="_LoBhR9zNEeWT_dg7TtxjFA" elementId="com.noname.guess.number.open" commandName="openCommand"/>
-  <commands xmi:id="_LoBhStzNEeWT_dg7TtxjFA" elementId="org.eclipse.ui.file.save" commandName="saveCommand"/>
   <commands xmi:id="_LoBhTdzNEeWT_dg7TtxjFA" elementId="org.eclipse.ui.help.aboutAction" commandName="aboutCommand"/>
   <addons xmi:id="_LoA6MtzNEeWT_dg7TtxjFA" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
   <addons xmi:id="_LoA6M9zNEeWT_dg7TtxjFA" elementId="org.eclipse.e4.ui.contexts.service" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
