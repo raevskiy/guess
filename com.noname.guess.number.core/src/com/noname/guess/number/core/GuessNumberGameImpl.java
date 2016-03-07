@@ -6,6 +6,11 @@ import java.util.List;
 import com.noname.guess.number.core.random.DefaultRandomGenerator;
 import com.noname.guess.number.core.random.RandomGenerator;
 
+/**
+ * Guess a number game implementation
+ * @author Северин
+ *
+ */
 public class GuessNumberGameImpl implements GuessNumberGame {
 	private static final double LOG_2 = Math.log(2);
 	private static final int NORMAL_PENALTY = 1;

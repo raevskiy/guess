@@ -22,6 +22,11 @@ import org.eclipse.swt.widgets.Table;
 import com.noname.guess.number.addons.GuessNumberAddon;
 import com.noname.guess.number.i18n.Messages;
 
+/**
+ * A part for showing rating
+ * @author Северин
+ *
+ */
 public class RatingPart {
 	private TableViewer tableViewerRating;
 	

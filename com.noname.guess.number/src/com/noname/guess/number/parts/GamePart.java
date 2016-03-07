@@ -55,6 +55,11 @@ import com.noname.guess.number.core.GuessNumberLevel;
 import com.noname.guess.number.core.dao.RatingDao;
 import com.noname.guess.number.i18n.Messages;
 
+/**
+ * A part where the game is played
+ * @author Северин
+ *
+ */
 public class GamePart {
 	private Composite introComposite;
 	private Composite gameComposite;
@@ -174,7 +179,6 @@ public class GamePart {
 						Messages.GamePart_RightAnswer + number);
 			}
 		});
-
 	}
 
 	private void addBoundaries(StringBuilder sb, GuessNumberLevel level) {

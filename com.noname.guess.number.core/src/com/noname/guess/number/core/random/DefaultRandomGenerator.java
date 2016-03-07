@@ -2,6 +2,11 @@ package com.noname.guess.number.core.random;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Default Random Integer Generator
+ * @author Северин
+ *
+ */
 public class DefaultRandomGenerator implements RandomGenerator {
 
 	@Override

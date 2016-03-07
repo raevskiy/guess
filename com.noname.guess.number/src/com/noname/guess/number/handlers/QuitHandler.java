@@ -19,7 +19,12 @@ import org.eclipse.swt.widgets.Shell;
 import com.noname.guess.number.core.GuessNumberGame;
 import com.noname.guess.number.i18n.Messages;
 
-
+/**
+ * Handles normal closing ("Game -> Exit")
+ * Does not handle cross button (for closing a game quickly, when the boss comes)
+ * @author Северин
+ *
+ */
 public class QuitHandler {
 	@Execute
 	public void execute(

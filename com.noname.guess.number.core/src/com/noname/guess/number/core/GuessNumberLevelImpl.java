@@ -1,10 +1,21 @@
 package com.noname.guess.number.core;
 
+/**
+ * Level implementation
+ * @author Северин
+ *
+ */
 public class GuessNumberLevelImpl implements GuessNumberLevel {
 	private final int lowerBound;
 	private final int upperBound;
 	private final String name;
 
+	/**
+	 * Level constructor
+	 * @param name - level name, cannot be null
+	 * @param lowerBound - lower bound for generated level, <= upper bound
+	 * @param upperBound - upper bound for generated level, >= lower bound
+	 */
 	public GuessNumberLevelImpl(
 			String name,
 			int lowerBound,

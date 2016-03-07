@@ -8,18 +8,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
- 
+
 /**
- * This class is a utility class for performing the serialization and
- * deserialization operations provided the required information.
+ * FileDao implementation
+ * @author Северин
  *
- * @author hiteshgarg
+ * @param <T>
  */
 public class FileDaoImpl<T> implements FileDao<T> {
-    /**
-     * deserialize to Object from given file. We use the general Object so as
-     * that it can work for any Java Class.
-     */
+	@Override
     public T deserialize(File file) throws IOException,
             ClassNotFoundException {
         FileInputStream fis = new FileInputStream(file);
@@ -31,9 +28,7 @@ public class FileDaoImpl<T> implements FileDao<T> {
         return obj;
     }
  
-    /**
-     * serialize the given object and save it to given file
-     */
+	@Override
     public void serialize(T obj, File file)
             throws IOException {
         FileOutputStream fos = new FileOutputStream(file);

@@ -17,6 +17,11 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.noname.guess.number.i18n.Messages;
 
+/**
+ * Hanldes "About" dialog showing
+ * @author Северин
+ *
+ */
 public class AboutHandler {
 	@Execute
 	public void execute(Shell shell) {

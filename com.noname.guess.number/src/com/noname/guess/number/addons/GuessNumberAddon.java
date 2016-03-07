@@ -22,6 +22,11 @@ import com.noname.guess.number.core.dao.RatingDao;
 import com.noname.guess.number.core.dao.RatingDaoImpl;
 import com.noname.guess.number.i18n.Messages;
 
+/**
+ * Guess a Number Addon.
+ * @author Северин
+ *
+ */
 public class GuessNumberAddon {
 	public static final String RATING_KEY = "rating"; //$NON-NLS-1$
 	public static final String DEFAULT_LEVEL_KEY = "default"; //$NON-NLS-1$
