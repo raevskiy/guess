@@ -12,8 +12,8 @@
                value="bundleclass://com.noname.guess.number/com.noname.guess.number.E4LifeCycle">
          </property>
          <property
-               name="applicationCSS"
-               value="platform:/plugin/com.noname.guess.number/css/default.css">
+               name="appName"
+               value="com.noname.guess.number">
          </property>
       </product>
    </extension>
