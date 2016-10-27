@@ -7,14 +7,14 @@ package com.noname.guess.number.core;
  */
 public interface GuessNumberGame {
 	/**
-	 * Starts a game on the specified difficulty level
+	 * Starts a game on the specified difficulty level.
 	 * The game, that is already started is restarted (like calling cancel + start)
 	 * @param level - level of difficulty
 	 */
 	void start(GuessNumberLevel level);
 	/**
-	 * Cancels a started game. The game, that is already over, cannot be stopped
-	 * @return
+	 * Cancels a started game. If the game is already over, nothing happens.
+	 * @return the guessed number
 	 */
 	int cancel();
 	/**
@@ -23,11 +23,11 @@ public interface GuessNumberGame {
 	 * @return 0 if generated value == value,
 	 *  a negative number if generated value < value,
 	 *  a positive number if generated value > value.
-	 *  No other assumptions are true. 
+	 * The absolute value of a returned value is non-determenistic. 
 	 */
 	int guess(int value);
 	/**
-	 * Is game in progress?
+	 * Is the game in progress?
 	 * @return
 	 */
 	boolean isInProgress();

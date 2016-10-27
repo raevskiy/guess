@@ -22,24 +22,19 @@ import com.noname.guess.number.core.dao.RatingDao;
 import com.noname.guess.number.core.dao.RatingDaoImpl;
 import com.noname.guess.number.i18n.Messages;
 
-/**
- * Guess a Number Addon.
- * @author Северин
- *
- */
+@SuppressWarnings("restriction")
 public class GuessNumberAddon {
 	public static final String RATING_KEY = "rating"; //$NON-NLS-1$
-	public static final String DEFAULT_LEVEL_KEY = "default"; //$NON-NLS-1$
 	
 	@PostConstruct
-	public void postCostConstruct(IEclipseContext context,
-			@SuppressWarnings("restriction") @Named(E4Workbench.INSTANCE_LOCATION) Location instanceLocation) throws UnsupportedEncodingException {
+	public void postCostConstruct(
+			IEclipseContext context,
+			@Named(E4Workbench.INSTANCE_LOCATION) Location instanceLocation) throws UnsupportedEncodingException {
 		GuessNumberLevel[] levels = new GuessNumberLevel[3];
 		levels[0] = new GuessNumberLevelImpl(Messages.GuessNumberAddon_LevelEasy, 0, 9);
 		levels[1] = new GuessNumberLevelImpl(Messages.GuessNumberAddon_LevelMedium, 0, 99);
 		levels[2] = new GuessNumberLevelImpl(Messages.GuessNumberAddon_LevelHard, 0, 999);
 		context.set(GuessNumberLevel[].class, levels);
-		context.set(DEFAULT_LEVEL_KEY, levels[1]);
 
 		GuessNumberGame game = new GuessNumberGameImpl();
 		context.set(GuessNumberGame.class, game);

@@ -6,14 +6,10 @@ import java.util.List;
 import com.noname.guess.number.core.random.DefaultRandomGenerator;
 import com.noname.guess.number.core.random.RandomGenerator;
 
-/**
- * Guess a number game implementation
- * @author Северин
- *
- */
 public class GuessNumberGameImpl implements GuessNumberGame {
 	private static final double LOG_2 = Math.log(2);
 	private static final int NORMAL_PENALTY = 1;
+	
 	private int number;
 	private int attempts;
 	private boolean isInProgress;
@@ -32,7 +28,6 @@ public class GuessNumberGameImpl implements GuessNumberGame {
 	public GuessNumberGameImpl(RandomGenerator randomGenerator) {
 		this.randomGenerator = randomGenerator;
 	}
-
 	
 	@Override
 	public void start(GuessNumberLevel level) {
@@ -57,8 +52,6 @@ public class GuessNumberGameImpl implements GuessNumberGame {
 
 	@Override
 	public int cancel() {
-		validateProgress();
-		
 		rating = 0;
 		stop();
 		return number;
@@ -70,34 +63,36 @@ public class GuessNumberGameImpl implements GuessNumberGame {
 	}
 	
 	private void stop() {
-		isInProgress = false;
-		for (GameEventListener listener : listeners)
-			listener.onGameStopped();
+		if (isInProgress) {
+			isInProgress = false;
+			for (GameEventListener listener : listeners)
+				listener.onGameStopped();
+		}
 	}
 	
-	private void validateProgress() {
-		if (!isInProgress)
-			throw new IllegalStateException("Game is not in progress");
-	}
-
 	@Override
 	public int guess(int value) {
-		validateProgress();
+		if (!isInProgress)
+			throw new IllegalStateException("The game is not in progress");
 		
 		attempts++;
-		//The first attempt has no penalty
-		if (attempts > 1) {
-			int penalty = (attempts <= binarySearchAttempts) ? NORMAL_PENALTY : bruteforcePenalty;
-			rating -= penalty;
-			rating = Math.max(rating, 1);
-		};
-
+		updateRating();
+		
 		//hide the difference to prevent abuse
 		int outcome = Integer.signum(value - number);
 		if (outcome == 0) {
 			stop();
 		}
 		return outcome;
+	}
+	
+	private void updateRating() {
+		//The first attempt has no penalty
+		if (attempts > 1) {
+			int penalty = (attempts <= binarySearchAttempts) ? NORMAL_PENALTY : bruteforcePenalty;
+			rating -= penalty;
+			rating = Math.max(rating, 1);
+		};
 	}
 
 	@Override

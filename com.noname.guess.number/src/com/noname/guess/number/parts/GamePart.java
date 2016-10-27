@@ -28,7 +28,6 @@ import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
@@ -54,12 +53,8 @@ import com.noname.guess.number.core.GuessNumberGame;
 import com.noname.guess.number.core.GuessNumberLevel;
 import com.noname.guess.number.core.dao.RatingDao;
 import com.noname.guess.number.i18n.Messages;
+import com.noname.guess.number.parts.jface.PlayerNameValidator;
 
-/**
- * A part where the game is played
- * @author Северин
- *
- */
 public class GamePart {
 	private Composite introComposite;
 	private Composite gameComposite;
@@ -82,30 +77,45 @@ public class GamePart {
 	@PostConstruct
 	public void createComposite(
 			Composite parent,
-			GuessNumberLevel[] levels,
-			@Named(GuessNumberAddon.DEFAULT_LEVEL_KEY) GuessNumberLevel defaultLevel) {
+			GuessNumberLevel[] levels) {
 		game.addGameEventListener(new GameEventListenerImpl(parent));
 
 		parent.setLayout(new GridLayout(1, false));
-
+		createIntroComposite(parent, levels);
+		createGameComposite(parent);
+	}
+	
+	private void createIntroComposite(Composite parent, GuessNumberLevel[] levels) {
 		introComposite = new Composite(parent, SWT.NONE);
 		introComposite.setLayout(new GridLayout(1, false));
 		GridData data = new GridData(GridData.FILL_BOTH);
 		data.exclude = false;
 		introComposite.setLayoutData(data);
-
+		
+		createSelectLevelGroup(levels);
+		createStartButton();
+	}
+	
+	private void createGameComposite(Composite parent) {
 		gameComposite = new Composite(parent, SWT.NONE);
 		gameComposite.setLayout(new GridLayout(2, false));
-		data = new GridData(GridData.FILL_BOTH);
+		GridData data = new GridData(GridData.FILL_BOTH);
 		data.exclude = true;
 		gameComposite.setLayoutData(data);
 		gameComposite.setVisible(false);
-
-		// Create the first Group
+		
+		createGuessValueSpinner();
+		createLabelOutcome();
+		createButtonGuess();
+		createButtonSurrender();
+	}
+	
+	private void createSelectLevelGroup(GuessNumberLevel[] levels) {
 		Group groupLevel = new Group(introComposite, SWT.SHADOW_IN);
 		groupLevel.setText(Messages.GamePart_Difficulty);
 		groupLevel.setLayout(new RowLayout(SWT.VERTICAL));
-		for (final GuessNumberLevel level : levels) {
+		for (int i = 0; i < levels.length; i++) {
+			GuessNumberLevel level = levels[i];
 			Button buttonLevel = new Button(groupLevel, SWT.RADIO);
 			StringBuilder levelDescription = new StringBuilder(level.getName());
 			addBoundaries(levelDescription, level);
@@ -119,13 +129,15 @@ public class GamePart {
 				}
 			});
 
-			if (level.equals(defaultLevel)) {
+			if (i == 0) {
 				buttonLevel.setSelection(true);
 				selectedLevel = level;
 			}
 		}
 		groupLevel.setLayoutData(new GridData(GridData.FILL_BOTH));
-
+	}
+	
+	private void createStartButton() {
 		buttonStart = new Button(introComposite, SWT.PUSH);
 		buttonStart.setText(Messages.GamePart_StartGame);
 		buttonStart.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -136,7 +148,9 @@ public class GamePart {
 			}
 		});
 		buttonStart.setEnabled(selectedLevel != null);
-
+	}
+	
+	private void createGuessValueSpinner() {
 		spinnerGuessValue = new Spinner(gameComposite, SWT.NONE);
 		spinnerGuessValue.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		spinnerGuessValue.addModifyListener(new ModifyListener() {
@@ -158,16 +172,22 @@ public class GamePart {
 				}
 			}
 		});
-
+	}
+	
+	private void createLabelOutcome() {
 		labelOutcome = new Label(gameComposite, SWT.NONE);
 		labelOutcome.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		labelOutcome.setText(""); //$NON-NLS-1$
-
+	}
+	
+	private void createButtonGuess() {
 		buttonGuess = new Button(gameComposite, SWT.PUSH);
 		buttonGuess.setText(Messages.GamePart_TryNumber);
 		buttonGuess.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		buttonGuess.addSelectionListener(new GuessSelectionAdapter());
-
+	}
+	
+	private void createButtonSurrender() {
 		Button buttonSurrender = new Button(gameComposite, SWT.PUSH);
 		buttonSurrender.setText(Messages.GamePart_Surrender);
 		buttonSurrender.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -196,75 +216,12 @@ public class GamePart {
 	@Persist
 	public void save() {
 	}
-	
-	private void updateRating(String playerName) {
-		Integer oldRating = rating.get(playerName);
-		if (oldRating == null) {
-			oldRating = 0;
-		}
 
-		int newRating;
-		try {
-			newRating = Math.addExact(oldRating, game.getRating());
-		} catch (ArithmeticException e) {
-			newRating = Integer.MAX_VALUE;
-		}
-		rating.put(playerName, newRating);
-		
-		try {
-			ratingDao.serialize(rating);
-		} catch (IOException e) {
-			MultiStatus status = createMultiStatus(e.getLocalizedMessage(), e);
-			ErrorDialog.openError(
-					Display.getCurrent().getActiveShell(),
-					Messages.GamePart_SerializeErrorTitle,
-					Messages.GamePart_SerializeErrorMessage,
-					status);
-		}
-	}
-
-	private static MultiStatus createMultiStatus(String msg, Throwable t) {
-		List<Status> childStatuses = new ArrayList<>();
-		StackTraceElement[] stackTraces = Thread.currentThread().getStackTrace();
-		String pluginId = "com.noname.guess.number"; //$NON-NLS-1$
-
-		for (StackTraceElement stackTrace : stackTraces) {
-			Status status = new Status(
-					IStatus.ERROR,
-					pluginId, 
-					stackTrace.toString());
-			childStatuses.add(status);
-		}
-
-		MultiStatus ms = new MultiStatus(
-				pluginId,
-				IStatus.ERROR,
-				childStatuses.toArray(new Status[] {}),
-				t.toString(),
-				t);
-		return ms;
-	}
-
-	/**
-	 * Game events' listener that adjusts SWT widgets
-	 * @author Северин
-	 *
-	 */
 	private class GameEventListenerImpl implements GameEventListener {
 		private final Composite parentComposite;
 
 		public GameEventListenerImpl(Composite parentComposite) {
 			this.parentComposite = parentComposite;
-		}
-
-		private void manageCompositeVisibility(boolean introVisible, boolean gameVisible) {
-			introComposite.setVisible(introVisible);
-			((GridData) introComposite.getLayoutData()).exclude = !introVisible;
-
-			gameComposite.setVisible(gameVisible);
-			((GridData) gameComposite.getLayoutData()).exclude = !gameVisible;
-
-			parentComposite.layout(false);
 		}
 
 		@Override
@@ -273,37 +230,26 @@ public class GamePart {
 			spinnerGuessValue.setMinimum(lowerBound);
 			spinnerGuessValue.setMaximum(selectedLevel.getUpperBound());
 			spinnerGuessValue.setSelection(lowerBound);
-			manageCompositeVisibility(false, true);
+			manageCompositeVisibility();
 		}
 
 		@Override
 		public void onGameStopped() {
-			manageCompositeVisibility(true, false);
+			manageCompositeVisibility();
+		}
+		
+		private void manageCompositeVisibility() {
+			boolean inProgress = game.isInProgress();
+			introComposite.setVisible(!inProgress);
+			((GridData) introComposite.getLayoutData()).exclude = inProgress;
+
+			gameComposite.setVisible(inProgress);
+			((GridData) gameComposite.getLayoutData()).exclude = !inProgress;
+
+			parentComposite.layout(false);
 		}
 	}
 
-	/**
-	 * Validates player's name
-	 * @author Северин
-	 *
-	 */
-	private class PlayerNameValidator implements IInputValidator {
-		@Override
-		public String isValid(String newText) {
-			int len = newText.length();
-			if (len < 1)
-				return Messages.GamePart_PlayerNameTooShort;
-			if (len > 20)
-				return Messages.GamePart_PlayerNameTooLong;
-			return null;
-		}
-	}
-	
-	/**
-	 * Guess button adapter
-	 * @author Северин
-	 *
-	 */
 	private class GuessSelectionAdapter extends SelectionAdapter {
 		@Override
 		public void widgetSelected(SelectionEvent event) {
@@ -314,23 +260,82 @@ public class GamePart {
 			} else if (outcome > 0) {
 				labelOutcome.setText(Messages.GamePart_Less + supposedValue);
 			} else {
-				Shell activeShell = Display.getCurrent().getActiveShell();
-				InputDialog dlg = new InputDialog(
-						activeShell,
-						Messages.GamePart_VictoryTitle + game.getAttempts(),
-						Messages.GamePart_InputPlayerName,
-						Messages.GamePart_DefaultPlayerName,
-						new PlayerNameValidator());
-				if (dlg.open() == Window.OK) {
-					updateRating(dlg.getValue());
-
-					MPart ratingPart = partService.findPart("com.noname.guess.number.rating"); //$NON-NLS-1$
-					if (ratingPart != null) {
-						partService.activate(ratingPart);
-						((RatingPart)ratingPart.getObject()).update(rating);
-					}
-				}
+				onGameWon();
 			}
+		}
+		
+		private void onGameWon() {
+			Shell activeShell = Display.getCurrent().getActiveShell();
+			InputDialog dlg = new InputDialog(
+					activeShell,
+					Messages.GamePart_VictoryTitle + game.getAttempts(),
+					Messages.GamePart_InputPlayerName,
+					Messages.GamePart_DefaultPlayerName,
+					new PlayerNameValidator());
+			if (dlg.open() == Window.OK) {
+				showRating(dlg.getValue());
+			}
+		}
+		
+		private void showRating(String playerName) {
+			updateRating(playerName);
+			MPart ratingPart = partService.findPart("com.noname.guess.number.rating"); //$NON-NLS-1$
+			if (ratingPart != null) {
+				partService.activate(ratingPart);
+				((RatingPart)ratingPart.getObject()).update(rating);
+			}
+		}
+		
+		private void updateRating(String playerName) {
+			rating.put(playerName, calculateNewRating(playerName));
+			
+			try {
+				ratingDao.serialize(rating);
+			} catch (IOException e) {
+				MultiStatus status = createMultiStatus(e.getLocalizedMessage(), e);
+				ErrorDialog.openError(
+						Display.getCurrent().getActiveShell(),
+						Messages.GamePart_SerializeErrorTitle,
+						Messages.GamePart_SerializeErrorMessage,
+						status);
+			}
+		}
+		
+		private int calculateNewRating(String playerName) {
+			Integer oldRating = rating.get(playerName);
+			if (oldRating == null) {
+				oldRating = 0;
+			}
+
+			int newRating;
+			try {
+				newRating = Math.addExact(oldRating, game.getRating());
+			} catch (ArithmeticException e) {
+				newRating = Integer.MAX_VALUE;
+			}
+			return newRating;
+		}
+		
+		private MultiStatus createMultiStatus(String msg, Throwable t) {
+			List<Status> childStatuses = new ArrayList<>();
+			StackTraceElement[] stackTraces = Thread.currentThread().getStackTrace();
+			String pluginId = "com.noname.guess.number"; //$NON-NLS-1$
+
+			for (StackTraceElement stackTrace : stackTraces) {
+				Status status = new Status(
+						IStatus.ERROR,
+						pluginId, 
+						stackTrace.toString());
+				childStatuses.add(status);
+			}
+
+			MultiStatus ms = new MultiStatus(
+					pluginId,
+					IStatus.ERROR,
+					childStatuses.toArray(new Status[] {}),
+					t.toString(),
+					t);
+			return ms;
 		}
 	}
 }

@@ -7,7 +7,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -20,23 +19,16 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 
 import com.noname.guess.number.addons.GuessNumberAddon;
+import com.noname.guess.number.core.Player;
 import com.noname.guess.number.i18n.Messages;
 
-/**
- * A part for showing rating
- * @author Северин
- *
- */
 public class RatingPart {
 	private TableViewer tableViewerRating;
 	
-	@Inject
-	public RatingPart() {
-
-	}
-
 	@PostConstruct
-	public void postConstruct(Composite parent, @Named(GuessNumberAddon.RATING_KEY) Map<String, Integer> rating) {
+	public void postConstruct(
+			Composite parent,
+			@Named(GuessNumberAddon.RATING_KEY) Map<String, Integer> rating) {
 		parent.setLayout(new FillLayout());
 		
 		tableViewerRating = new TableViewer(parent);
@@ -44,7 +36,13 @@ public class RatingPart {
 		final Table table = tableViewerRating.getTable();
 	    table.setHeaderVisible(true);
 	    table.setLinesVisible(true);
-
+	    createNameColumn();
+	    createRatingColumn();
+		
+		update(rating);
+	}
+	
+	private void createNameColumn() {
 		TableViewerColumn colName = new TableViewerColumn(tableViewerRating, SWT.NONE);
 		colName.getColumn().setWidth(200);
 		colName.getColumn().setText(Messages.RatingPart_PlayerName);
@@ -55,7 +53,9 @@ public class RatingPart {
 				return p.getName();
 			}
 		});
-
+	}
+	
+	private void createRatingColumn() {
 		TableViewerColumn colRating = new TableViewerColumn(tableViewerRating, SWT.NONE);
 		colRating.getColumn().setWidth(200);
 		colRating.getColumn().setText(Messages.RatingPart_PlayerRating);
@@ -66,8 +66,6 @@ public class RatingPart {
 				return Integer.toString(p.getRating());
 			}
 		});
-		
-		update(rating);
 	}
 	
 	public void update(Map<String, Integer> rating) {
@@ -78,32 +76,4 @@ public class RatingPart {
 		}
 		tableViewerRating.setInput(sortedRating);
 	}
-	
-	private class Player implements Comparable<Player> {
-		private String name;
-		private int rating = 0;
-		
-		public Player(String name, int rating) {
-			this.name = name;
-			this.rating = rating;
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public int getRating() {
-			return rating;
-		}
-
-		@Override
-		public int compareTo(Player o) {
-			int ratingDiff = o.getRating() - this.rating;
-			if (ratingDiff != 0)
-				return ratingDiff;
-			else
-				return this.name.compareTo(o.getName());
-		}
-	}
-
 }
