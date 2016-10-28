@@ -5,7 +5,6 @@ import java.io.IOException;
 
 /**
  * Dao for loading and saving in files
- * @author Северин
  *
  * @param <T>
  */

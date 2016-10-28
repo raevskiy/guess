@@ -1,14 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2010 - 2013 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *     Lars Vogel <lars.Vogel@gmail.com> - Bug 419770
- *******************************************************************************/
 package com.noname.guess.number.parts;
 
 import java.io.IOException;
@@ -156,19 +145,15 @@ public class GamePart {
 		spinnerGuessValue.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent event) {
-				try {
-					Integer newInteger = Integer.parseInt(spinnerGuessValue.getText());
-					if (newInteger <= spinnerGuessValue.getMaximum() && newInteger >= spinnerGuessValue.getMinimum()) {
-						labelOutcome.setText(""); //$NON-NLS-1$
-						buttonGuess.setEnabled(true);
-					} else {
-						StringBuilder sb = new StringBuilder(Messages.GamePart_RangeHint);
-						addBoundaries(sb, selectedLevel);
-						labelOutcome.setText(sb.toString());
-						buttonGuess.setEnabled(false);
-					}
-				} catch (NumberFormatException e) {
-					// NOP
+				Integer newInteger = Integer.parseInt(spinnerGuessValue.getText());
+				if (newInteger <= spinnerGuessValue.getMaximum() && newInteger >= spinnerGuessValue.getMinimum()) {
+					labelOutcome.setText(""); //$NON-NLS-1$
+					buttonGuess.setEnabled(true);
+				} else {
+					StringBuilder sb = new StringBuilder(Messages.GamePart_RangeHint);
+					addBoundaries(sb, selectedLevel);
+					labelOutcome.setText(sb.toString());
+					buttonGuess.setEnabled(false);
 				}
 			}
 		});

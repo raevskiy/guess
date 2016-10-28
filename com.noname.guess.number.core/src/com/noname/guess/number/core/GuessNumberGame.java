@@ -1,10 +1,5 @@
 package com.noname.guess.number.core;
 
-/**
- * Guess a Number game
- * @author Северин
- *
- */
 public interface GuessNumberGame {
 	/**
 	 * Starts a game on the specified difficulty level.
@@ -23,7 +18,7 @@ public interface GuessNumberGame {
 	 * @return 0 if generated value == value,
 	 *  a negative number if generated value < value,
 	 *  a positive number if generated value > value.
-	 * The absolute value of a returned value is non-determenistic. 
+	 * The absolute value of a returned value is non-deterministic. 
 	 */
 	int guess(int value);
 	/**

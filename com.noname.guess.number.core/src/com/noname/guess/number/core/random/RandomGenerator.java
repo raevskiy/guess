@@ -1,10 +1,5 @@
 package com.noname.guess.number.core.random;
 
-/**
- * Random Integer Generator
- * @author Северин
- *
- */
 public interface RandomGenerator {
 	/**
 	 * Generate random integer

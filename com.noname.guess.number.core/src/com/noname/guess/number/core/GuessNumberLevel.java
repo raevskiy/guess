@@ -1,10 +1,5 @@
 package com.noname.guess.number.core;
 
-/**
- * Guess a number game difficulty level
- * @author Северин
- *
- */
 public interface GuessNumberLevel {
 	/**
 	 * Level name, human-readable

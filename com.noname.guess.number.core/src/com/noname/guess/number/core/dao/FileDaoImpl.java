@@ -9,12 +9,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-/**
- * FileDao implementation
- * @author Северин
- *
- * @param <T>
- */
 public class FileDaoImpl<T> implements FileDao<T> {
 	@Override
     public T deserialize(File file) throws IOException,
